@@ -7,7 +7,7 @@ from dateutil import tz
 
 
 SPORT_KEYWORD = "hockey"
-LIVETV_FORMAT = "http://ams-lp{server}.9c9media.com/hls-live/livepkgr/_definst_/liveeventNoDRM/tsnOpen{quality}.m3u8?title={title}&logo={logo}"
+LIVETV_FORMAT = "http://ams-lp{server}.9c9media.com/hls-live/livepkgr/_definst_/liveeventNoDRM/{channel}Open{quality}.m3u8?title={title}&logo={logo}"
 
 VIDEO_PREFIX = "/video/tsn"
 NAME = "TSN"
@@ -69,13 +69,26 @@ def LiveTVChannel(title, icon):
 	dir = ObjectContainer(title2 = title, art=R(icon))
 	
 	server = ""
+	channel = ""
 		
 	if title == "TSN1":
 		server = "5"
+		channel = "tsn"
 	elif title == "TSN2":
 		server = "7"
+		channel = "TSN2"		
+	elif title == "TSN3":
+		server = "1"
+		channel = "TSN3"
+	elif title == "TSN4":
+		server = "2"
+		channel = "TSN4"
+	elif title == "TSN5":
+		server = "3"
+		channel = "TSN5"
 		
-	baseurl = LIVETV_FORMAT.replace("{server}", server).replace("{title}", title).replace("{logo}", icon)
+		
+	baseurl = LIVETV_FORMAT.replace("{server}", server).replace("{title}", title).replace("{logo}", icon).replace("{channel}", channel)
 	
 	url8 = baseurl.replace("{quality}", "8")
 	url7 = baseurl.replace("{quality}", "7")

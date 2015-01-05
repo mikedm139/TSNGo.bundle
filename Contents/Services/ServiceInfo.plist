@@ -9,11 +9,13 @@
 				<key>TestURLs</key>
 				<array>
 					<string>http://ams-lp5.9c9media.com/hls-live/livepkgr/_definst_/liveeventNoDRM/tsnOpen1.m3u8</string>
-					<string>http://ams-lp5.9c9media.com/hls-live/livepkgr/_definst_/liveeventNoDRM/tsnOpen1.m3u8</string>
+					<string>http://ams-lp7.9c9media.com/hls-live/livepkgr/_definst_/liveeventNoDRM/tsn2Open1.m3u8</string>
 				</array>
 				<key>URLPatterns</key>
 				<array>
 					<string>^http://ams-lp.+.9c9media.com/hls-live/livepkgr/_definst_/liveeventNoDRM/tsnOpen.+.m3u8?.+</string>
+					<string>^http://ams-lp.+.9c9media.com/hls-live/livepkgr/_definst_/liveeventNoDRM/tsn.+Open.+.m3u8?.+</string>
+					<string>^http://ams-lp.+.9c9media.com/hls-live/livepkgr/_definst_/liveeventNoDRM/TSN.+Open.+.m3u8?.+</string>
 				</array>
 			</dict>
 		</dict>
