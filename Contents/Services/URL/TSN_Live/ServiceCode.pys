@@ -1,0 +1,88 @@
+import string
+
+LIVE_STREAM_FORMAT = "http://nlds{server}.cdnak.neulion.com/nlds/nhl/{streamName}/as/live/{streamName}_hd_{q}.m3u8"
+REPLAY_STREAM_FORMAT = "http://nlds{server}.cdnak.neulion.com/nlds_vod/nhl/vod/{year}/{month}/{day}/{gameNumber}/{type}_{gameNumber}_{away}_{home}_1314_{awayHome}_{fullShort}_{replayNumber}_{q}_ipad.mp4.m3u8"
+HIGHLIGHT_FORMAT = "http://nhl.cdnllnwnl.neulion.net/u/nhlmobile/vod/nhl/{year}/{month}/{day}/{gameNumber}/{type}_{gameNumber}_{away}_{home}_1314_{awayHome}_discrete_{key}_{highlightType}_{highlightNumber}_{q}.mp4"
+QUALITY_MARKER = "{q}" 
+
+####################################################################################################
+def MetadataObjectForURL(url):
+		
+	Log.Info("Generate TSN metadata for " + url)
+		
+	# "http://ams-lp{server}.9c9media.com/hls-live/livepkgr/_definst_/liveeventNoDRM/tsnOpen{quality}.m3u8?title=TSN1&logo=ICON_TSN1"
+	data = ParseQueryString(url)
+	#Log.Debug("data: " + str(data))
+	
+	title = data["title"]	
+	#desc = data["summary"]
+	logo = R(data["logo"])
+	
+    # Construct a metadata item
+	return VideoClipObject(
+		title = title,
+		thumb=logo,
+		summary = title
+	)
+
+####################################################################################################
+@deferred # tells plex not to call this until the link is clicked
+def MediaObjectsForURL(url):
+
+	Log.Debug("Live URL: " + url)
+	
+	return [
+		 MediaObject(
+			optimized_for_streaming=True,
+			parts = [PartObject(key=HTTPLiveStreamURL(Callback(PlayHLS, url=url)))],
+		)
+	]
+
+
+
+####################################################################################################
+	
+def PlayHLS2(url):
+	# this seems to work on the iOS clients, and it's way easier...
+	# if only we could set the user-agent on the redirect to player.
+	return Redirect(url)
+	
+def PlayHLS(url):
+	Log.Debug("service PlayVideo: " + url)
+	
+	playlist = HTTP.Request(url, follow_redirects=False).content
+
+	index = string.rfind(url, ".com/")
+	playlist_base = url[0:index+5]
+	Log.Debug("base: " + playlist_base)
+
+	new_playlist = ""
+
+	
+	for line in playlist.splitlines():
+		if line.startswith('#'):
+			# take it as is
+			Log.Debug("line: " + line)
+			new_playlist = new_playlist + line + "\n"
+		else:
+			line = playlist_base + line.replace("../", "")
+			Log.Debug("line: " + line)
+			new_playlist = new_playlist + line + "\n"
+
+	return new_playlist
+		
+def ParseQueryString(url):	
+	queryStart = url.find("?") + 1
+	query = url[queryStart:len(url)]
+	Log.Debug("Query string: " + query)
+	parts = query.split("&")	
+	data = {}
+	
+	for part in parts:
+		kvp = part.split("=")
+		key = kvp[0]
+		value = kvp[1]
+		data[key] = value
+
+	return data
+	
