@@ -27,22 +27,14 @@ def Start():
 	
 	Log.Debug("Plugin Start")
 
-def MainMenu():
-	dir = ObjectContainer(title2 = L("MainMenuTitle"), art=R(ART), view_group = "List")
-	
+def MainMenu():	
 	# log some details about the request
 	live.LogMainMenu()
 	
-	dir.add(DirectoryObject(title = L("Live TV"), thumb = R(ICON_LIVETV), key = Callback(LiveTVMenu)))
-	
-	return dir
-	
-def LiveTVMenu():
-
-	dir = ObjectContainer(title2 = L("Live TV"), art=R(ICON_LIVETV), view_group = "List")
+	dir = ObjectContainer(title2 = L("TSN"), art=R(ICON_LIVETV), view_group = "List")
 	
 	live.BuildChannelMenu(dir, LISTINGS_URL, LiveTVChannel)
-			
+	
 	return dir
 	 	
 def LiveTVChannel(name, url, logo):

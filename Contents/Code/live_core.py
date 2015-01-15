@@ -23,20 +23,39 @@ def BuildChannelMenu(container, listingsUrl, callback):
 	
 	for channel in lineup["Channels"]:
 		Log.Debug(channel["Name"])
-		currentlyPlaying = GetCurrentShow(channel["Schedule"])
+		currentlyPlaying, nextUp, nextUpTime = GetScheduledShows(channel["Schedule"])
 		Log.Debug(currentlyPlaying)
 		
+		# Format: 1:05 PM
+		summary = "Up Next: " + nextUp + " @ " + nextUpTime.strftime("%I:%M %p").lstrip("0")
+		
 		#channelName = channel["Name"] + " - " + currentlyPlaying
-		menuItem = DirectoryObject(title = currentlyPlaying, thumb = channel["Logo"], key = Callback(callback, name = channel["Name"], url = channel["Feed"], logo = channel["Logo"]))
+		menuItem = DirectoryObject(title = currentlyPlaying, thumb = channel["Logo"], summary = summary, key = Callback(callback, name = channel["Name"], url = channel["Feed"], logo = channel["Logo"]))
 		container.add(menuItem)
 		
-def GetCurrentShow(scheduleUrl):
+def GetScheduledShows(scheduleUrl):
 	schedule = JSON.ObjectFromURL(scheduleUrl)
 		
 	nowEastern = datetime.datetime.now(EASTERN)
+	
+	nowPlaying = ""
+	foundCurrent = False
+	upNext = ""
+	upNextStart = None
 	
 	for item in schedule["Items"]:
 		startTime = parser.parse(item["StartTime"])
 		endTime = parser.parse(item["EndTime"])
 		if nowEastern >= startTime and nowEastern < endTime:
-			return item["Name"]
+			nowPlaying = item["Name"]
+			foundCurrent = True
+			continue
+		if foundCurrent == True:
+			# we found the current one, and we're still in the loop, so this must be the next one.
+			upNext = item["Name"]
+			upNextStart = parser.parse(item["StartTime"]).astimezone(HERE)
+			break # we're done here.
+			
+	#end for
+	
+	return nowPlaying, upNext, upNextStart
