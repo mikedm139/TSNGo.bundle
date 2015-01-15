@@ -30,7 +30,11 @@ def BuildChannelMenu(container, listingsUrl, callback):
 		summary = "Up Next: " + nextUp + " @ " + nextUpTime.strftime("%I:%M %p").lstrip("0")
 		
 		#channelName = channel["Name"] + " - " + currentlyPlaying
-		menuItem = DirectoryObject(title = currentlyPlaying, thumb = channel["Logo"], summary = summary, key = Callback(callback, name = channel["Name"], url = channel["Feed"], logo = channel["Logo"]))
+		#menuItem = DirectoryObject(title = currentlyPlaying, thumb = channel["Logo"], summary = summary, key = Callback(callback, name = channel["Name"], url = channel["Feed"], logo = channel["Logo"]))
+		# url = url8, title = "Quality 8", thumb = logo		
+		url = channel["Feed"] + "?title=" + channel["Name"] + "&desc=" + currentlyPlaying + "&logo=" + channel["Logo"]
+		menuItem = VideoClipObject(url = url, title = currentlyPlaying, thumb = channel["Logo"], summary = summary)
+	
 		container.add(menuItem)
 		
 def GetScheduledShows(scheduleUrl):

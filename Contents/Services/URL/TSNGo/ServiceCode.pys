@@ -10,19 +10,19 @@ def MetadataObjectForURL(url):
 		
 	Log.Info("Generate TSN metadata for " + url)
 		
-	# "http://ams-lp{server}.9c9media.com/hls-live/livepkgr/_definst_/liveeventNoDRM/tsnOpen{quality}.m3u8?title=TSN1&logo=ICON_TSN1"
+	# "http://ams-lp{server}.9c9media.com/hls-live/livepkgr/_definst_/liveeventNoDRM/tsnOpen{quality}.m3u8?title=TSN1&desc=ShowTitle&logo=iconurl"
 	data = ParseQueryString(url)
 	#Log.Debug("data: " + str(data))
 	
 	title = data["title"]	
-	#desc = data["summary"]
-	logo = R(data["logo"])
+	desc = data["desc"]
+	logo = data["logo"]
 	
     # Construct a metadata item
 	return VideoClipObject(
 		title = title,
 		thumb=logo,
-		summary = title
+		summary = desc
 	)
 
 ####################################################################################################
@@ -31,10 +31,70 @@ def MediaObjectsForURL(url):
 
 	Log.Debug("Live URL: " + url)
 	
+	url8 = url.replace("{quality}", "8")
+	url7 = url.replace("{quality}", "7")
+	url6 = url.replace("{quality}", "6")
+	url5 = url.replace("{quality}", "5")
+	url4 = url.replace("{quality}", "4")
+	url3 = url.replace("{quality}", "3")
+	url2 = url.replace("{quality}", "2")
+	url1 = url.replace("{quality}", "1")
+	
+	#return [
+	#	 MediaObject(
+	#		optimized_for_streaming=True,
+	#		parts = [PartObject(key=HTTPLiveStreamURL(Callback(PlayHLS, url=url)))],
+	#	)
+	#]
+	
 	return [
-		 MediaObject(
+		MediaObject(
 			optimized_for_streaming=True,
-			parts = [PartObject(key=HTTPLiveStreamURL(Callback(PlayHLS, url=url)))],
+			parts = [PartObject(key=HTTPLiveStreamURL(Callback(PlayHLS, url=url8)))],
+			bitrate = 2048,
+			video_resolution = 720
+		),
+		MediaObject(
+			optimized_for_streaming=True,
+			parts = [PartObject(key=HTTPLiveStreamURL(Callback(PlayHLS, url=url7)))],
+			bitrate = 1856,
+			video_resolution = 540
+		),
+		MediaObject(
+			optimized_for_streaming=True,
+			parts = [PartObject(key=HTTPLiveStreamURL(Callback(PlayHLS, url=url6)))],
+			bitrate = 1536,
+			video_resolution = 540
+		),
+		MediaObject(
+			optimized_for_streaming=True,
+			parts = [PartObject(key=HTTPLiveStreamURL(Callback(PlayHLS, url=url5)))],
+			bitrate = 1280,
+			video_resolution = 360
+		),
+		MediaObject(
+			optimized_for_streaming=True,
+			parts = [PartObject(key=HTTPLiveStreamURL(Callback(PlayHLS, url=url4)))],
+			bitrate = 896,
+			video_resolution = 360
+		),
+		MediaObject(
+			optimized_for_streaming=True,
+			parts = [PartObject(key=HTTPLiveStreamURL(Callback(PlayHLS, url=url3)))],
+			bitrate = 640,
+			video_resolution = 360
+		),
+		MediaObject(
+			optimized_for_streaming=True,
+			parts = [PartObject(key=HTTPLiveStreamURL(Callback(PlayHLS, url=url2)))],
+			bitrate = 480,
+			video_resolution = 360
+		),
+		MediaObject(
+			optimized_for_streaming=True,
+			parts = [PartObject(key=HTTPLiveStreamURL(Callback(PlayHLS, url=url1)))],
+			bitrate = 300,
+			video_resolution = 240
 		)
 	]
 

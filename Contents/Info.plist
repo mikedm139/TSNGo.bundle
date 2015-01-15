@@ -3,7 +3,7 @@
 <plist version="1.0">
 	<dict>
 		<key>CFBundleIdentifier</key>
-		<string>com.plexapp.plugins.tsn</string>
+		<string>com.plexapp.plugins.tsngo</string>
 				
 		<key>PlexClientPlatforms</key>
 		<string>*</string>
@@ -19,10 +19,6 @@
 		
 		<key>PlexFrameworkVersion</key>
 		<string>2</string>
-		<!--<key>PlexFrameworkFlags</key>
-		<array>
-			<string>UseRealRTMP</string>
-		</array>-->
 		
 	</dict>
 </plist>

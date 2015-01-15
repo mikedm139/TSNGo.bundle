@@ -1,2 +1,2 @@
-TSN.bundle
+TSNGo.bundle
 ====================

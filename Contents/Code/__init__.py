@@ -3,14 +3,13 @@ import live_core as live
 
 ###############################################
 
-VIDEO_PREFIX = "/video/tsn"
-NAME = "TSN"
+VIDEO_PREFIX = "/video/tsngo"
+NAME = "TSN Go"
 
-LISTINGS_URL = "https://rawgit.com/pudds/JsonData/master/tv/tsn.json"
+LISTINGS_URL = "https://raw.githubusercontent.com/pudds/JsonData/master/tv/tsn.json"
 
-ART = 'art-default.png'
+ART = 'art-default.jpg'
 ICON = 'icon-default.png'
-ICON_LIVETV = 'tsn-channels.jpg'
 
 
 ###############################################
@@ -31,7 +30,7 @@ def MainMenu():
 	# log some details about the request
 	live.LogMainMenu()
 	
-	dir = ObjectContainer(title2 = L("TSN"), art=R(ICON_LIVETV), view_group = "List")
+	dir = ObjectContainer(title2 = L("TSN"), art=R(ICON), view_group = "List")
 	
 	live.BuildChannelMenu(dir, LISTINGS_URL, LiveTVChannel)
 	
