@@ -1,4 +1,5 @@
 import string
+import urllib
 
 LIVE_STREAM_FORMAT = "http://nlds{server}.cdnak.neulion.com/nlds/nhl/{streamName}/as/live/{streamName}_hd_{q}.m3u8"
 REPLAY_STREAM_FORMAT = "http://nlds{server}.cdnak.neulion.com/nlds_vod/nhl/vod/{year}/{month}/{day}/{gameNumber}/{type}_{gameNumber}_{away}_{home}_1314_{awayHome}_{fullShort}_{replayNumber}_{q}_ipad.mp4.m3u8"
@@ -15,7 +16,7 @@ def MetadataObjectForURL(url):
 	#Log.Debug("data: " + str(data))
 	
 	title = data["title"]	
-	desc = data["desc"]
+	desc = urllib.unquote(data["desc"])
 	logo = data["logo"]
 	
     # Construct a metadata item
@@ -28,7 +29,10 @@ def MetadataObjectForURL(url):
 ####################################################################################################
 @deferred # tells plex not to call this until the link is clicked
 def MediaObjectsForURL(url):
-
+	
+	# some clients encode the url, so the quality tag is messed up
+	url = url.replace("%7B", "{").replace("%7D", "}")
+	
 	Log.Debug("Live URL: " + url)
 	
 	url8 = url.replace("{quality}", "8")
@@ -39,60 +43,68 @@ def MediaObjectsForURL(url):
 	url3 = url.replace("{quality}", "3")
 	url2 = url.replace("{quality}", "2")
 	url1 = url.replace("{quality}", "1")
+			
+	client = Client.Platform
+	Log.Info("Playback Client: " + str(Client.Platform))
 	
-	#return [
-	#	 MediaObject(
-	#		optimized_for_streaming=True,
-	#		parts = [PartObject(key=HTTPLiveStreamURL(Callback(PlayHLS, url=url)))],
-	#	)
-	#]
+	# default playback method:
+	callback = PlayHLS
 	
+	# some clients need to use a different playback method
+	if client == "Android":
+		callback = PlayHLSIndirect
+		
+	if client == "iOS":
+		callback = PlayHLSIndirect
+		
+	
+	# build media object list
 	return [
 		MediaObject(
 			optimized_for_streaming=True,
-			parts = [PartObject(key=HTTPLiveStreamURL(Callback(PlayHLS, url=url8)))],
+			parts = [PartObject(key=HTTPLiveStreamURL(Callback(callback, url=url8)))],
 			bitrate = 2048,
 			video_resolution = 720
 		),
 		MediaObject(
 			optimized_for_streaming=True,
-			parts = [PartObject(key=HTTPLiveStreamURL(Callback(PlayHLS, url=url7)))],
+			parts = [PartObject(key=HTTPLiveStreamURL(Callback(callback, url=url7)))],
 			bitrate = 1856,
 			video_resolution = 540
 		),
 		MediaObject(
 			optimized_for_streaming=True,
-			parts = [PartObject(key=HTTPLiveStreamURL(Callback(PlayHLS, url=url6)))],
+			parts = [PartObject(key=HTTPLiveStreamURL(Callback(callback, url=url6)))],
 			bitrate = 1536,
 			video_resolution = 540
 		),
 		MediaObject(
 			optimized_for_streaming=True,
-			parts = [PartObject(key=HTTPLiveStreamURL(Callback(PlayHLS, url=url5)))],
+			parts = [PartObject(key=HTTPLiveStreamURL(Callback(callback, url=url5)))],
 			bitrate = 1280,
 			video_resolution = 360
 		),
 		MediaObject(
 			optimized_for_streaming=True,
-			parts = [PartObject(key=HTTPLiveStreamURL(Callback(PlayHLS, url=url4)))],
+			parts = [PartObject(key=HTTPLiveStreamURL(Callback(callback, url=url4)))],
 			bitrate = 896,
 			video_resolution = 360
 		),
 		MediaObject(
 			optimized_for_streaming=True,
-			parts = [PartObject(key=HTTPLiveStreamURL(Callback(PlayHLS, url=url3)))],
+			parts = [PartObject(key=HTTPLiveStreamURL(Callback(callback, url=url3)))],
 			bitrate = 640,
 			video_resolution = 360
 		),
 		MediaObject(
 			optimized_for_streaming=True,
-			parts = [PartObject(key=HTTPLiveStreamURL(Callback(PlayHLS, url=url2)))],
+			parts = [PartObject(key=HTTPLiveStreamURL(Callback(callback, url=url2)))],
 			bitrate = 480,
 			video_resolution = 360
 		),
 		MediaObject(
 			optimized_for_streaming=True,
-			parts = [PartObject(key=HTTPLiveStreamURL(Callback(PlayHLS, url=url1)))],
+			parts = [PartObject(key=HTTPLiveStreamURL(Callback(callback, url=url1)))],
 			bitrate = 300,
 			video_resolution = 240
 		)
@@ -102,14 +114,15 @@ def MediaObjectsForURL(url):
 
 ####################################################################################################
 	
-def PlayHLS2(url):
-	# this seems to work on the iOS clients, and it's way easier...
-	# if only we could set the user-agent on the redirect to player.
-	return Redirect(url)
+
+@indirect
+def PlayHLSIndirect(url):
+	return IndirectResponse(VideoClipObject, key = HTTPLiveStreamURL(url))
+	
 	
 def PlayHLS(url):
-	Log.Debug("service PlayVideo: " + url)
-	
+	Log.Debug("PlayHLS: " + url)
+		
 	playlist = HTTP.Request(url, follow_redirects=False).content
 
 	index = string.rfind(url, ".com/")

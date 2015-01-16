@@ -2,11 +2,9 @@ import re, urlparse, string, socket, sys, datetime, locale
 from dateutil import tz
 from dateutil import parser
 import urllib2
+import urllib
+import __init__ as channel
 
-
-HERE = tz.tzlocal()
-UTC = tz.tzutc()
-EASTERN = tz.gettz("EST5EDT")
 
 
 
@@ -21,50 +19,21 @@ def BuildChannelMenu(container, listingsUrl, callback):
 	
 	lineup = JSON.ObjectFromURL(listingsUrl)
 	
-	for channel in lineup["Channels"]:
-		Log.Debug(channel["Name"])
-		currentlyPlaying, nextUp, nextUpTime = GetScheduledShows(channel["Schedule"])
-		Log.Debug(currentlyPlaying)
+	for channelItem in lineup["Channels"]:
+		currentlyPlaying, nextUp, nextUpTime = channel.GetScheduledShows(channelItem["Schedule"])
+		
+		Log.Debug("Found Channel: " + channelItem["Name"] + "; Currently Playing: " + currentlyPlaying)
 		
 		if currentlyPlaying == "":
-			currentlyPlaying = channel["Name"]
+			currentlyPlaying = channelItem["Name"]
 		
 		# Format: 1:05 PM
 		summary = ""
 		if nextUpTime != None:
 			summary = "Up Next: " + nextUp + " @ " + nextUpTime.strftime("%I:%M %p").lstrip("0")
-		
-		#channelName = channel["Name"] + " - " + currentlyPlaying
-		#menuItem = DirectoryObject(title = currentlyPlaying, thumb = channel["Logo"], summary = summary, key = Callback(callback, name = channel["Name"], url = channel["Feed"], logo = channel["Logo"]))
-		# url = url8, title = "Quality 8", thumb = logo		
-		url = channel["Feed"] + "?title=" + channel["Name"] + "&desc=" + currentlyPlaying + "&logo=" + channel["Logo"]
-		menuItem = VideoClipObject(url = url, title = currentlyPlaying, thumb = channel["Logo"], summary = summary)
+			
+		url = channelItem["Feed"] + "?title=" + channelItem["Name"] + "&desc=" + urllib.quote(currentlyPlaying) + "&logo=" + channelItem["Logo"]
+		menuItem = VideoClipObject(url = url, title = currentlyPlaying, thumb = channelItem["Logo"], summary = summary)
 	
 		container.add(menuItem)
 		
-def GetScheduledShows(scheduleUrl):
-	schedule = JSON.ObjectFromURL(scheduleUrl)
-		
-	nowEastern = datetime.datetime.now(EASTERN)
-	
-	nowPlaying = ""
-	foundCurrent = False
-	upNext = ""
-	upNextStart = None
-	
-	for item in schedule["Items"]:
-		startTime = parser.parse(item["StartTime"])
-		endTime = parser.parse(item["EndTime"])
-		if nowEastern >= startTime and nowEastern < endTime:
-			nowPlaying = item["Name"]
-			foundCurrent = True
-			continue
-		if foundCurrent == True:
-			# we found the current one, and we're still in the loop, so this must be the next one.
-			upNext = item["Name"]
-			upNextStart = parser.parse(item["StartTime"]).astimezone(HERE)
-			break # we're done here.
-			
-	#end for
-	
-	return nowPlaying, upNext, upNextStart
