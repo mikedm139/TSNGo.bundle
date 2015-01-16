@@ -26,8 +26,13 @@ def BuildChannelMenu(container, listingsUrl, callback):
 		currentlyPlaying, nextUp, nextUpTime = GetScheduledShows(channel["Schedule"])
 		Log.Debug(currentlyPlaying)
 		
+		if currentlyPlaying == "":
+			currentlyPlaying = channel["Name"]
+		
 		# Format: 1:05 PM
-		summary = "Up Next: " + nextUp + " @ " + nextUpTime.strftime("%I:%M %p").lstrip("0")
+		summary = ""
+		if nextUpTime != None:
+			summary = "Up Next: " + nextUp + " @ " + nextUpTime.strftime("%I:%M %p").lstrip("0")
 		
 		#channelName = channel["Name"] + " - " + currentlyPlaying
 		#menuItem = DirectoryObject(title = currentlyPlaying, thumb = channel["Logo"], summary = summary, key = Callback(callback, name = channel["Name"], url = channel["Feed"], logo = channel["Logo"]))
