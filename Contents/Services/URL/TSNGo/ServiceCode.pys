@@ -54,61 +54,78 @@ def MediaObjectsForURL(url):
 	if client == "Android":
 		callback = PlayHLSIndirect
 		
+	#if client == "Roku":
+	#	callback = PlayHLSRoku
+				
 	if client == "iOS":
 		callback = PlayHLSIndirect
 		
 	
 	# build media object list
-	return [
-		MediaObject(
-			optimized_for_streaming=True,
-			parts = [PartObject(key=HTTPLiveStreamURL(Callback(callback, url=url8)))],
-			bitrate = 2048,
-			video_resolution = 720
-		),
-		MediaObject(
-			optimized_for_streaming=True,
-			parts = [PartObject(key=HTTPLiveStreamURL(Callback(callback, url=url7)))],
-			bitrate = 1856,
-			video_resolution = 540
-		),
-		MediaObject(
-			optimized_for_streaming=True,
-			parts = [PartObject(key=HTTPLiveStreamURL(Callback(callback, url=url6)))],
-			bitrate = 1536,
-			video_resolution = 540
-		),
-		MediaObject(
-			optimized_for_streaming=True,
-			parts = [PartObject(key=HTTPLiveStreamURL(Callback(callback, url=url5)))],
-			bitrate = 1280,
-			video_resolution = 360
-		),
-		MediaObject(
-			optimized_for_streaming=True,
-			parts = [PartObject(key=HTTPLiveStreamURL(Callback(callback, url=url4)))],
-			bitrate = 896,
-			video_resolution = 360
-		),
-		MediaObject(
-			optimized_for_streaming=True,
-			parts = [PartObject(key=HTTPLiveStreamURL(Callback(callback, url=url3)))],
-			bitrate = 640,
-			video_resolution = 360
-		),
-		MediaObject(
-			optimized_for_streaming=True,
-			parts = [PartObject(key=HTTPLiveStreamURL(Callback(callback, url=url2)))],
-			bitrate = 480,
-			video_resolution = 360
-		),
-		MediaObject(
-			optimized_for_streaming=True,
-			parts = [PartObject(key=HTTPLiveStreamURL(Callback(callback, url=url1)))],
-			bitrate = 300,
-			video_resolution = 240
-		)
-	]
+	# Roku has a stupid bug in the latest firmware, which breaks support for single bitrate HLS playlists.  The workaround (hopefully temporary), is to set the bitrate to 0.
+	if client == "Roku":
+		Log.Debug("Roku workaround, setting bitrate zero")
+		return [
+			MediaObject(
+				optimized_for_streaming=True,
+				parts = [PartObject(key=HTTPLiveStreamURL(Callback(callback, url=url8)))],
+				bitrate = 0,
+				video_resolution = 720
+			)
+		]
+		
+	else:
+		Log.Debug("Creating MediaObjects")
+		return [
+			MediaObject(
+				optimized_for_streaming=True,
+				parts = [PartObject(key=HTTPLiveStreamURL(Callback(callback, url=url8)))],
+				bitrate = 2048,
+				video_resolution = 720
+			),
+			MediaObject(
+				optimized_for_streaming=True,
+				parts = [PartObject(key=HTTPLiveStreamURL(Callback(callback, url=url7)))],
+				bitrate = 1856,
+				video_resolution = 540
+			),
+			MediaObject(
+				optimized_for_streaming=True,
+				parts = [PartObject(key=HTTPLiveStreamURL(Callback(callback, url=url6)))],
+				bitrate = 1536,
+				video_resolution = 540
+			),
+			MediaObject(
+				optimized_for_streaming=True,
+				parts = [PartObject(key=HTTPLiveStreamURL(Callback(callback, url=url5)))],
+				bitrate = 1280,
+				video_resolution = 360
+			),
+			MediaObject(
+				optimized_for_streaming=True,
+				parts = [PartObject(key=HTTPLiveStreamURL(Callback(callback, url=url4)))],
+				bitrate = 896,
+				video_resolution = 360
+			),
+			MediaObject(
+				optimized_for_streaming=True,
+				parts = [PartObject(key=HTTPLiveStreamURL(Callback(callback, url=url3)))],
+				bitrate = 640,
+				video_resolution = 360
+			),
+			MediaObject(
+				optimized_for_streaming=True,
+				parts = [PartObject(key=HTTPLiveStreamURL(Callback(callback, url=url2)))],
+				bitrate = 480,
+				video_resolution = 360
+			),
+			MediaObject(
+				optimized_for_streaming=True,
+				parts = [PartObject(key=HTTPLiveStreamURL(Callback(callback, url=url1)))],
+				bitrate = 300,
+				video_resolution = 240
+			)
+		]
 
 
 
@@ -117,8 +134,9 @@ def MediaObjectsForURL(url):
 
 @indirect
 def PlayHLSIndirect(url):
+	Log.Debug("IndirectResponse: " + url)
 	return IndirectResponse(VideoClipObject, key = HTTPLiveStreamURL(url))
-	
+		
 	
 def PlayHLS(url):
 	Log.Debug("PlayHLS: " + url)
