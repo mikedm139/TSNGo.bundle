@@ -13,11 +13,7 @@
 				</array>
 				<key>URLPatterns</key>
 				<array>
-					<string>^http://ams-lp.+.9c9media.com/hls-live/livepkgr/_definst_/liveeventNoDRM/tsnOpen.+.m3u8?.+</string>
-					<string>^http://ams-lp.+.9c9media.com/hls-live/livepkgr/_definst_/liveeventNoDRM/tsn.+Open.+.m3u8?.+</string>
-					<string>^http://ams-lp.+.9c9media.com/hls-live/livepkgr/_definst_/liveeventNoDRM/TSN.+Open.+.m3u8?.+</string>
-					<string>^http://ams-lp.+.9c9media.com/hls-live/livepkgr/_definst_/liveeventNoDRM/tsnOpen{quality}.m3u8?.+</string>
-					<string>^http://ams-lp.+.9c9media.com/hls-live/livepkgr/_definst_/liveeventNoDRM/TSN.+Open{quality}.m3u8?.+</string>
+					<string>^https://raw.githubusercontent.com/pudds/JsonData/master/channels/tsn/.+.json?.+</string>
 				</array>
 			</dict>
 		</dict>
