@@ -55,7 +55,7 @@ def MediaObjectsForURL(url):
 			MediaObject(
 				optimized_for_streaming=True,
 				parts = [PartObject(key=HTTPLiveStreamURL(Callback(callback, url=feed["url"])))],
-				bitrate = feed["bitrate"],
+				bitrate = 0,
 				video_resolution = feed["resolution"]
 			)
 		]
@@ -90,8 +90,20 @@ def PlayHLS(url):
 	playlist = HTTP.Request(url, follow_redirects=False).content
 
 	index = string.rfind(url, ".com/")
+	
+	if index == -1:
+		index = string.rfind(url, ".net/")
+	
 	playlist_base = url[0:index+5]
 	Log.Debug("base: " + playlist_base)
+	
+	pathIndex = string.rfind(url, "/")
+	playlist_path = url[0:pathIndex]
+	
+	if playlist_path.endswith("/") == False:
+		playlist_path = playlist_path + "/"
+	
+	Log.Debug("path: " + playlist_path)
 
 	new_playlist = ""
 
@@ -102,12 +114,18 @@ def PlayHLS(url):
 			Log.Debug("line: " + line)
 			new_playlist = new_playlist + line + "\n"
 		else:
-			line = playlist_base + line.replace("../", "")
+			relative = string.find(url, "../") > -1
+			if relative:
+				line = playlist_base + line.replace("../", "")
+			else:
+				line = playlist_path + line
+				
 			Log.Debug("line: " + line)
 			new_playlist = new_playlist + line + "\n"
 
 	return new_playlist
-		
+	
+	
 def ParseQueryString(url):	
 	queryStart = url.find("?") + 1
 	query = url[queryStart:len(url)]
